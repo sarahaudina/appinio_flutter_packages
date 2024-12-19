@@ -21,6 +21,8 @@ public class SwiftAppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDele
     private let SYSTEM_SHARE:String = "system_share";
     private let COPY_TO_CLIPBOARD:String = "copy_to_clipboard";
     private let TELEGRAM:String = "telegram";
+    private let LINKEDIN_FEED:String = "linkedin_feed"
+    private let LINKEDIN_DIRECT:String = "linkedin_direct"
     private let INSTALLED_APPS:String = "installed_apps";
 
 
@@ -82,6 +84,12 @@ public class SwiftAppinioSocialSharePlugin: NSObject, FlutterPlugin, SharingDele
           break
       case MESSENGER:
           shareUtil.shareToMessenger(args: args!, result: result)
+          break
+      case LINKEDIN_FEED:
+          shareUtil.shareToLinkedinFeed(args: args!, result: result)
+          break
+      case LINKEDIN_DIRECT:
+          shareUtil.shareToLinkedinDirect(args: args!, result: result)
           break
       default:
           result(shareUtil.ERROR)

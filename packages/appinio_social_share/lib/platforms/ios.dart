@@ -93,4 +93,12 @@ class IOS {
     return AppinioSocialSharePlatform.instance
         .shareToSMS(message, filePaths: []);
   }
+
+  Future<String> shareToLinkedinFeed(String message) {
+    return AppinioSocialSharePlatform.instance.shareToLinkedinFeed(message);
+  }
+
+  Future<String> shareToLinkedinDirect(String message) {
+    return AppinioSocialSharePlatform.instance.shareToLinkedinDirect(message);
+  }
 }

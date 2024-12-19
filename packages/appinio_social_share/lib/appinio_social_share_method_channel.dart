@@ -34,6 +34,8 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   final String telegramAndroidMultiFiles = "telegram_android_multifiles";
   final String installedApps = "installed_apps";
   final String whatsappImgIos = "whatsapp_img_ios";
+  final String linkedinFeed = "linkedin_feed";
+  final String linkedinDirect = "linkedin_direct";
 
   /// The method channel used to interact with the native platform.
   @visibleForTesting
@@ -286,5 +288,15 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
     return ((await methodChannel.invokeMethod<String>(
             facebook, {"imagePaths": filePaths, "message": hashtag})) ??
         "");
+  }
+
+  @override
+  Future<String> shareToLinkedinFeed(String message) async {
+    return ((await methodChannel.invokeMethod<String>(linkedinFeed, {"message": message})) ?? "");
+  }
+
+  @override
+  Future<String> shareToLinkedinDirect(String message) async {
+    return ((await methodChannel.invokeMethod<String>(linkedinDirect, {"message": message})) ?? "");
   }
 }

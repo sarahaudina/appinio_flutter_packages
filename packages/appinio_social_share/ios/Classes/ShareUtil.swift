@@ -30,7 +30,7 @@ public class ShareUtil{
 
     
     public func getInstalledApps(result: @escaping FlutterResult){
-        let apps = [["instagram","instagram"],["facebook-stories","facebook_stories"],["whatsapp","whatsapp"],["tg","telegram"],["fb-messenger","messenger"],["tiktok","snssdk1233"],["instagram-stories","instagram_stories"],["twitter","twitter"],["sms","message"]]
+        let apps = [["instagram","instagram"],["facebook-stories","facebook_stories"],["whatsapp","whatsapp"],["tg","telegram"],["fb-messenger","messenger"],["tiktok","snssdk1233"],["instagram-stories","instagram_stories"],["twitter","twitter"],["sms","message"],["linkedin","linkedin"]]
         var output:[String: Bool] = [:]
         for app in apps {
             if(UIApplication.shared.canOpenURL(URL(string:(app[0])+"://")!)){
@@ -38,6 +38,7 @@ public class ShareUtil{
                     output["facebook"] = true
 
                 }
+
                 output[app[1]] = true
             }else{
                 output[app[1]] = false
@@ -49,7 +50,6 @@ public class ShareUtil{
     public func canOpenUrl(appName:String) -> Bool{
          return UIApplication.shared.canOpenURL(URL(string:appName+"://")!)
     }
-
 
 
     public func shareToInstagramFeed(args : [String: Any?],result: @escaping FlutterResult) {
@@ -588,6 +588,53 @@ public class ShareUtil{
         }
     }
     
+    public func shareToLinkedinFeed(args: [String: Any?], result: @escaping FlutterResult) {
+        let message = args[argMessage] as? String
+
+        if (message == nil) {
+            result(ERROR)
+            return
+        }
+
+        let linkedinFeedUrlString = "linkedin://shareArticle?mini=true&url="+message!
+
+        guard let linkedinFeedURL = URL(string: linkedinFeedUrlString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!) else {
+            result(ERROR_APP_NOT_AVAILABLE)
+            return
+        }
+
+        if (!UIApplication.shared.canOpenURL(linkedinFeedURL)) {
+            result("CANNOT SHARE TO LINKEDIN FEED")
+            return
+        }
+
+        UIApplication.shared.open(linkedinFeedURL, options: [:])
+        result(linkedinFeedURL)
+    }
+
+    public func shareToLinkedinDirect(args: [String: Any?], result: @escaping FlutterResult) {
+        let message = args[argMessage] as? String
+
+        if (message == nil) {
+            result(ERROR)
+            return
+        }
+
+        let linkedinDirectUrlString = "linkedin://messaging/compose?body="+message!
+
+        guard let linkedinDirectURL = URL(string: linkedinDirectUrlString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!) else {
+            result(ERROR_APP_NOT_AVAILABLE)
+            return
+        }
+
+        if (!UIApplication.shared.canOpenURL(linkedinDirectURL)) {
+            result("CANNOT SHARE TO LINKEDIN DIRECT")
+            return
+        }
+
+        UIApplication.shared.open(linkedinDirectURL, options: [:])
+        result(SUCCESS)
+    }
 }
 
 extension UIApplication {
