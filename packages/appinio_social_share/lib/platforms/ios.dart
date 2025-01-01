@@ -13,18 +13,24 @@ class IOS {
     return AppinioSocialSharePlatform.instance.shareImageToWhatsApp(filePath);
   }
 
-  Future<String> shareToTwitter(String message, String? filePath) {
+  Future<String> shareToTwitter(String message, {String? filePath}) {
     return AppinioSocialSharePlatform.instance
-        .shareToTwitter(message, filePath);
+        .shareToTwitter(message, filePath: filePath);
   }
 
-  Future<String> shareToInstagramDirect(String message) {
-    return AppinioSocialSharePlatform.instance.shareToInstagramDirect(message);
+  Future<String> shareToInstagramDirect(
+    String appId,
+    String message,
+  ) {
+    return AppinioSocialSharePlatform.instance.shareToInstagramDirect(
+      appId,
+      message,
+    );
   }
 
-  Future<String> shareToInstagramFeed(String imagePath) {
+  Future<String> shareToInstagramFeed(String message, String imagePath) {
     return AppinioSocialSharePlatform.instance
-        .shareToInstagramFeed("", imagePath);
+        .shareToInstagramFeed(message, imagePath);
   }
 
   Future<String> shareToInstagramReels(String videoPath) {
@@ -45,20 +51,26 @@ class IOS {
         .shareToFacebook(hashtag, filePaths);
   }
 
-  Future<String> shareToInstagramStory(String appId,
-      {String? stickerImage,
-      String? backgroundImage,
-      String? backgroundVideo,
-      String? backgroundTopColor,
-      String? backgroundBottomColor,
-      String? attributionURL}) {
-    return AppinioSocialSharePlatform.instance.shareToInstagramStory(appId,
-        stickerImage: stickerImage,
-        backgroundImage: backgroundImage,
-        backgroundVideo: backgroundVideo,
-        backgroundTopColor: backgroundTopColor,
-        backgroundBottomColor: backgroundBottomColor,
-        attributionURL: attributionURL);
+  Future<String> shareToInstagramStory(
+    String appId, {
+    String? stickerImage,
+    String? backgroundImage,
+    String? backgroundVideo,
+    String? backgroundTopColor,
+    String? backgroundBottomColor,
+    String? attributionURL,
+    String? message,
+  }) {
+    return AppinioSocialSharePlatform.instance.shareToInstagramStory(
+      appId,
+      stickerImage: stickerImage,
+      backgroundImage: backgroundImage,
+      backgroundVideo: backgroundVideo,
+      backgroundTopColor: backgroundTopColor,
+      backgroundBottomColor: backgroundBottomColor,
+      attributionURL: attributionURL,
+      message: message,
+    );
   }
 
   Future<String> shareToFacebookStory(String appId,

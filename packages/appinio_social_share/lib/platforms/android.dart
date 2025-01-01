@@ -21,13 +21,17 @@ class Android {
         .shareToTelegramAndroidMultiFiles(filePaths);
   }
 
-  Future<String> shareToTwitter(String message, String? filePath) {
+  Future<String> shareToTwitter(String message, {String? filePath}) {
     return AppinioSocialSharePlatform.instance
-        .shareToTwitterAndroid(message, filePath);
+        .shareToTwitterAndroid(message, filePath: filePath);
   }
 
-  Future<String> shareToInstagramDirect(String message) {
-    return AppinioSocialSharePlatform.instance.shareToInstagramDirect(message);
+  Future<String> shareToInstagramDirect(
+    String appId,
+    String message,
+  ) {
+    return AppinioSocialSharePlatform.instance
+        .shareToInstagramDirect(appId, message);
   }
 
   Future<String> shareToInstagramFeed(String message, String? filePath) {
@@ -58,20 +62,26 @@ class Android {
         .shareToFacebook(hashtag, filePaths);
   }
 
-  Future<String> shareToInstagramStory(String appId,
-      {String? stickerImage,
-      String? backgroundImage,
-      String? backgroundVideo,
-      String? backgroundTopColor,
-      String? backgroundBottomColor,
-      String? attributionURL}) {
-    return AppinioSocialSharePlatform.instance.shareToInstagramStory(appId,
-        stickerImage: stickerImage,
-        backgroundImage: backgroundImage,
-        backgroundVideo: backgroundVideo,
-        backgroundTopColor: backgroundTopColor,
-        backgroundBottomColor: backgroundBottomColor,
-        attributionURL: attributionURL);
+  Future<String> shareToInstagramStory(
+    String appId, {
+    String? stickerImage,
+    String? backgroundImage,
+    String? backgroundVideo,
+    String? backgroundTopColor,
+    String? backgroundBottomColor,
+    String? attributionURL,
+    String? message,
+  }) {
+    return AppinioSocialSharePlatform.instance.shareToInstagramStory(
+      appId,
+      stickerImage: stickerImage,
+      backgroundImage: backgroundImage,
+      backgroundVideo: backgroundVideo,
+      backgroundTopColor: backgroundTopColor,
+      backgroundBottomColor: backgroundBottomColor,
+      attributionURL: attributionURL,
+      message: message,
+    );
   }
 
   Future<String> shareToFacebookStory(String appId,
@@ -113,5 +123,15 @@ class Android {
   Future<String> shareFilesToSMS(List<String> filePaths) {
     return AppinioSocialSharePlatform.instance
         .shareToSMSAndroidMultifiles(filePaths);
+  }
+
+  Future<String> shareToLinkedinFeed(String message, String? imagePath) {
+    return AppinioSocialSharePlatform.instance
+        .shareToLinkedinFeedAndroid(message, imagePath);
+  }
+
+  Future<String> shareToLinkedinDirect(String message, String? imagePath) {
+    return AppinioSocialSharePlatform.instance
+        .shareToLinkedinDirectAndroid(message, imagePath);
   }
 }

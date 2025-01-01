@@ -44,6 +44,8 @@ public class AppinioSocialSharePlugin implements FlutterPlugin, MethodCallHandle
     private final String COPY_TO_CLIPBOARD = "copy_to_clipboard";
     private final String TELEGRAM_ANDROID = "telegram_android";
     private final String TELEGRAM_ANDROID_MULTIFILES = "telegram_android_multifiles";
+    private final String LINKEDIN_FEED = "linkedin_feed";
+    private final String LINKEDIN_DIRECT = "linkedin_direct";
 
 
     private SocialShareUtil socialShareUtil;
@@ -92,13 +94,13 @@ public class AppinioSocialSharePlugin implements FlutterPlugin, MethodCallHandle
                 result.success(response);
                 return null;
             case INSTAGRAM_DIRECT:
-                return socialShareUtil.shareToInstagramDirect(message, activeContext);
+                return socialShareUtil.shareToInstagramDirect(appId, message, activeContext);
             case INSTAGRAM_FEED:
                 return socialShareUtil.shareToInstagramFeed(imagePath, message, activeContext, message);
             case INSTAGRAM_FEED_FILES:
                 return socialShareUtil.shareToInstagramFeedFiles(imagePaths, activeContext,message);
             case INSTAGRAM_STORIES:
-                return socialShareUtil.shareToInstagramStory(appId, stickerImage, backgroundImage, backgroundTopColor, backgroundBottomColor, attributionURL, activeContext);
+                return socialShareUtil.shareToInstagramStory(appId, stickerImage, backgroundImage, backgroundTopColor, backgroundBottomColor, attributionURL, message, activeContext);
             case FACEBOOK_STORIES:
                 return socialShareUtil.shareToFaceBookStory(appId, stickerImage, backgroundImage, backgroundTopColor, backgroundBottomColor, attributionURL, activeContext);
             case MESSENGER:
@@ -131,6 +133,10 @@ public class AppinioSocialSharePlugin implements FlutterPlugin, MethodCallHandle
                 return socialShareUtil.shareToSMS(message, activeContext, imagePath);
             case SMS_ANDROID_MULTIFILES:
                 return socialShareUtil.shareToSMSFiles(activeContext, imagePaths);
+            case LINKEDIN_FEED:
+                return socialShareUtil.shareToLinkedinFeed(message, imagePath, activeContext);
+            case LINKEDIN_DIRECT:
+                return socialShareUtil.shareToLinkedinDirect(message, imagePath, activeContext);
             default:
                 return null;
         }

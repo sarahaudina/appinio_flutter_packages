@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:appinio_social_share/enums/enum_social_media.dart';
+import 'package:appinio_social_share/extensions/string_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -75,7 +77,7 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   }
 
   @override
-  Future<String> shareToTwitter(String message, String? filePath) async {
+  Future<String> shareToTwitter(String message, {String? filePath}) async {
     return ((await methodChannel.invokeMethod<String>(twitter, {
           "imagePaths": filePath == null ? [] : [filePath],
           "message": message
@@ -84,9 +86,12 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   }
 
   @override
-  Future<String> shareToTwitterAndroid(String message, String? filePath) async {
-    return ((await methodChannel.invokeMethod<String>(
-            twitterAndroid, {"imagePath": filePath, "message": message})) ??
+  Future<String> shareToTwitterAndroid(String message,
+      {String? filePath}) async {
+    return ((await methodChannel.invokeMethod<String>(twitterAndroid, {
+          "imagePath": filePath,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.twitter),
+        })) ??
         "");
   }
 
@@ -100,8 +105,10 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   @override
   Future<String> shareToTelegram(String message,
       {List<String>? filePaths}) async {
-    return ((await methodChannel.invokeMethod<String>(
-            telegram, {"imagePaths": filePaths, "message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(telegram, {
+          "imagePaths": filePaths,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.telegram),
+        })) ??
         "");
   }
 
@@ -110,7 +117,7 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
       String message, String? filePath) async {
     return ((await methodChannel.invokeMethod<String>(telegramAndroid, {
           "imagePath": filePath,
-          "message": message,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.telegram),
         })) ??
         "");
   }
@@ -129,16 +136,20 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   @override
   Future<String> shareToWhatsapp(String message,
       {List<String>? filePaths}) async {
-    return ((await methodChannel.invokeMethod<String>(
-            whatsapp, {"imagePaths": filePaths, "message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(whatsapp, {
+          "imagePaths": filePaths,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.whatsapp),
+        })) ??
         "");
   }
 
   @override
   Future<String> shareToWhatsappAndroid(
       String message, String? filePath) async {
-    return ((await methodChannel.invokeMethod<String>(
-            whatsappAndroid, {"imagePath": filePath, "message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(whatsappAndroid, {
+          "imagePath": filePath,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.whatsapp),
+        })) ??
         "");
   }
 
@@ -152,15 +163,19 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
 
   @override
   Future<String> shareToSMS(String message, {List<String>? filePaths}) async {
-    return ((await methodChannel.invokeMethod<String>(
-            sms, {"message": message, "imagePaths": filePaths})) ??
+    return ((await methodChannel.invokeMethod<String>(sms, {
+          "message": message.toMarkdown(),
+          "imagePaths": filePaths,
+        })) ??
         "");
   }
 
   @override
   Future<String> shareToSMSAndroid(String message, String? filePath) async {
-    return ((await methodChannel.invokeMethod<String>(
-            smsAndroid, {"message": message, "imagePath": filePath})) ??
+    return ((await methodChannel.invokeMethod<String>(smsAndroid, {
+          "message": message.toMarkdown(),
+          "imagePath": filePath,
+        })) ??
         "");
   }
 
@@ -173,24 +188,31 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
 
   @override
   Future<String> copyToClipBoard(String message) async {
-    return ((await methodChannel
-            .invokeMethod<String>(copyToClipboard, {"message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(copyToClipboard, {
+          "message": message.toMarkdown(),
+        })) ??
         "");
   }
 
   @override
   Future<String> shareToSystem(String title, String message,
       {List<String>? filePaths}) async {
-    return ((await methodChannel.invokeMethod<String>(systemShare,
-            {"message": message, "title": title, "imagePaths": filePaths})) ??
+    return ((await methodChannel.invokeMethod<String>(systemShare, {
+          "message": message.toMarkdown(),
+          "title": title,
+          "imagePaths": filePaths,
+        })) ??
         "");
   }
 
   @override
   Future<String> shareToSystemAndroid(
       String title, String message, String? filePath) async {
-    return ((await methodChannel.invokeMethod<String>(systemShareAndroid,
-            {"message": message, "title": title, "imagePath": filePath})) ??
+    return ((await methodChannel.invokeMethod<String>(systemShareAndroid, {
+          "message": message.toMarkdown(),
+          "title": title,
+          "imagePath": filePath,
+        })) ??
         "");
   }
 
@@ -204,16 +226,23 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   }
 
   @override
-  Future<String> shareToInstagramDirect(String message) async {
-    return ((await methodChannel
-            .invokeMethod<String>(instagramDirect, {"message": message})) ??
+  Future<String> shareToInstagramDirect(
+    String appId,
+    String message,
+  ) async {
+    return ((await methodChannel.invokeMethod<String>(instagramDirect, {
+          "appId": appId,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.instagram),
+        })) ??
         "");
   }
 
   @override
   Future<String> shareToInstagramFeed(String message, String? filePath) async {
-    return ((await methodChannel.invokeMethod<String>(
-            instagramFeed, {"imagePath": filePath, "message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(instagramFeed, {
+          "imagePath": filePath,
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.instagram),
+        })) ??
         "");
   }
 
@@ -227,8 +256,9 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
 
   @override
   Future<String> shareToMessenger(String message) async {
-    return ((await methodChannel
-            .invokeMethod<String>(messenger, {"message": message})) ??
+    return ((await methodChannel.invokeMethod<String>(messenger, {
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.whatsapp),
+        })) ??
         "");
   }
 
@@ -242,13 +272,18 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   }
 
   @override
-  Future<String> shareToInstagramStory(String appId,
-      {String? stickerImage,
-      String? backgroundImage,
-      String? backgroundVideo,
-      String? backgroundTopColor,
-      String? backgroundBottomColor,
-      String? attributionURL}) async {
+  Future<String> shareToInstagramStory(
+    String appId, {
+    String? stickerImage,
+    String? backgroundImage,
+    String? backgroundVideo,
+    String? backgroundTopColor,
+    String? backgroundBottomColor,
+    String? attributionURL,
+    String? message,
+  }) async {
+    List<String> urls = message?.toMarkdown().getUrls() ?? [];
+
     return ((await methodChannel.invokeMethod<String>(instagramStories, {
           "stickerImage": stickerImage,
           "backgroundImage":
@@ -257,7 +292,8 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
           "backgroundTopColor": backgroundTopColor,
           "backgroundBottomColor": backgroundBottomColor,
           "attributionURL": attributionURL,
-          "appId": appId
+          "appId": appId,
+          "message": urls.isNotEmpty ? urls.first : null,
         })) ??
         "");
   }
@@ -292,11 +328,37 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
 
   @override
   Future<String> shareToLinkedinFeed(String message) async {
-    return ((await methodChannel.invokeMethod<String>(linkedinFeed, {"message": message})) ?? "");
+    return ((await methodChannel.invokeMethod<String>(linkedinFeed, {
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
+        })) ??
+        "");
   }
 
   @override
   Future<String> shareToLinkedinDirect(String message) async {
-    return ((await methodChannel.invokeMethod<String>(linkedinDirect, {"message": message})) ?? "");
+    return ((await methodChannel.invokeMethod<String>(linkedinDirect, {
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
+        })) ??
+        "");
+  }
+
+  @override
+  Future<String> shareToLinkedinFeedAndroid(
+      String message, String? imagePath) async {
+    return ((await methodChannel.invokeMethod<String>(linkedinFeed, {
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
+          "imagePath": imagePath,
+        })) ??
+        "");
+  }
+
+  @override
+  Future<String> shareToLinkedinDirectAndroid(
+      String message, String? imagePath) async {
+    return ((await methodChannel.invokeMethod<String>(linkedinDirect, {
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
+          "imagePath": imagePath,
+        })) ??
+        "");
   }
 }

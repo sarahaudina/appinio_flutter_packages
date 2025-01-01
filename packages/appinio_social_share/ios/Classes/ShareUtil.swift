@@ -205,6 +205,8 @@ public class ShareUtil{
 
                             if UIApplication.shared.canOpenURL(url) {
 
+                                copyToClipboard(args: args, result: result)
+
                                 if #available(iOS 10.0, *) {
 
                                     UIApplication.shared.open(url, options: [:], completionHandler: { (success) in
@@ -488,7 +490,6 @@ public class ShareUtil{
         UIApplication.topViewController()?.present(composeCtl!,animated:true,completion:nil);
         result(SUCCESS)
     }
-
     
     func shareToInstagramStory(args : [String: Any?],result: @escaping FlutterResult) {
         if #available(iOS 10.0, *){
@@ -499,7 +500,7 @@ public class ShareUtil{
             let backgroundTopColor = args[self.argBackgroundTopColor] as? String
             let backgroundBottomColor =  args[self.argBackgroundBottomColor] as? String
             let attributionURL =  args[self.argAttributionURL] as? String
-
+            let message: String? = args[self.argMessage] as? String
             
             guard let instagramURL = URL(string: "instagram-stories://share?source_application=\(appId!)") else {
                 result(ERROR_APP_NOT_AVAILABLE)
@@ -529,6 +530,7 @@ public class ShareUtil{
                         "com.instagram.sharedSticker.backgroundImage": backgroundImage ?? "",
                         "com.instagram.sharedSticker.backgroundTopColor": backgroundTopColor ?? "",
                         "com.instagram.sharedSticker.backgroundBottomColor": backgroundBottomColor ?? "",
+                        UIPasteboard.general.string: message ?? "",
                     ]
                 ]
                 let pasteboardOptions = [

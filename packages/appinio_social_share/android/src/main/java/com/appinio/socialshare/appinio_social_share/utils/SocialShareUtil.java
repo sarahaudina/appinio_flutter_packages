@@ -49,8 +49,10 @@ public class SocialShareUtil {
     private final String TWITTER_PACKAGE = "com.twitter.android";
     private final String INSTAGRAM_STORY_PACKAGE = "com.instagram.share.ADD_TO_STORY";
     private final String INSTAGRAM_FEED_PACKAGE = "com.instagram.share.ADD_TO_FEED";
+    private final String INSTAGRAM_DIRECT_PACKAGE = "com.instagram.direct.share.handler.DirectShareHandlerActivityInterop";
     private final String WHATSAPP_PACKAGE = "com.whatsapp";
     private final String TELEGRAM_PACKAGE = "org.telegram.messenger";
+    private final String TELEGRAM_STORY_PACKAGE = "org.telegram.ui.LaunchActivity";
     private final String TIKTOK_PACKAGE = "com.zhiliaoapp.musically";
     private final String FACEBOOK_STORY_PACKAGE = "com.facebook.stories.ADD_TO_STORY";
     private final String FACEBOOK_PACKAGE = "com.facebook.katana";
@@ -58,6 +60,9 @@ public class SocialShareUtil {
     private final String FACEBOOK_MESSENGER_PACKAGE = "com.facebook.orca";
     private final String FACEBOOK_MESSENGER_LITE_PACKAGE = "com.facebook.mlite";
     private final String SMS_DEFAULT_APPLICATION = "sms_default_application";
+    private final String LINKEDIN_PACKAGE = "com.linkedin.android";
+    private final String LINKEDIN_FEED_PACKAGE = "com.linkedin.android.publishing.sharing.SharingDeepLinkActivity";
+    private final String LINKEDIN_MESSAGE_PACKAGE = "com.linkedin.android.publishing.sharing.MessagingDeepLinkActivity";
 
 
     private static CallbackManager callbackManager;
@@ -69,11 +74,6 @@ public class SocialShareUtil {
 
     public String shareToWhatsAppFiles(ArrayList<String> imagePaths, Context context) {
         return shareFilesToPackage(imagePaths, context, WHATSAPP_PACKAGE);
-    }
-
-
-    public String shareToInstagramDirect(String text, Context activity) {
-        return shareTextToPackage(text, activity, INSTAGRAM_PACKAGE);
     }
 
     public String shareToInstagramFeed(String imagePath, String message, Context activity, String text) {
@@ -204,31 +204,56 @@ public class SocialShareUtil {
         }
     }
 
+    public String shareToInstagramDirect(String appId, String text, Context activity) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
 
-    public String shareToInstagramStory(String appId, String stickerImage, String backgroundImage, String backgroundTopColor, String backgroundBottomColor, String attributionURL, Context activity) {
+        shareIntent.setType("text/plain");
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.putExtra("source_application", appId);
+        shareIntent.putExtra("com.facebook.platform.extra.APPLICATION_ID", appId);
+        shareIntent.setPackage(INSTAGRAM_PACKAGE);
 
         try {
+            activity.startActivity(shareIntent);
+            return SUCCESS;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getLocalizedMessage();
+        }
+    }
 
+    public String shareToInstagramStory(String appId, String stickerImage, String backgroundImage, String backgroundTopColor, String backgroundBottomColor, String attributionURL, String message, Context activity) {
+
+        try {
             Intent shareIntent = new Intent(INSTAGRAM_STORY_PACKAGE);
+
             shareIntent.setType("image/*");
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
             if (stickerImage != null) {
                 File file = new File(stickerImage);
                 Uri stickerImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
                 shareIntent.putExtra("interactive_asset_uri", stickerImageUri);
                 activity.grantUriPermission("com.instagram.android", stickerImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
+
             if (backgroundImage != null) {
                 File file1 = new File(backgroundImage);
                 Uri backgroundImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file1);
                 shareIntent.setDataAndType(backgroundImageUri, getMimeTypeOfFile(backgroundImage));
                 activity.grantUriPermission("com.instagram.android", backgroundImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
+
             shareIntent.putExtra("source_application", appId);
             shareIntent.putExtra("content_url", attributionURL);
             shareIntent.putExtra("top_background_color", backgroundTopColor);
             shareIntent.putExtra("bottom_background_color", backgroundBottomColor);
+
+            copyToClipBoard(message, activity);
+
             activity.startActivity(shareIntent);
             return SUCCESS;
         } catch (Exception e) {
@@ -316,6 +341,64 @@ public class SocialShareUtil {
         }
     }
 
+    public String shareToLinkedinFeed(String message, String imagePath, Context activity) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+        if (imagePath != null) {
+            Uri fileUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", new File(imagePath));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.setType(getMimeTypeOfFile(imagePath));
+        } else {
+            shareIntent.setType("text/plain");
+        }
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+        shareIntent.putExtra("content_url", message);
+        shareIntent.putExtra(Intent.EXTRA_TITLE, message);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        shareIntent.setPackage(LINKEDIN_PACKAGE);
+
+        shareIntent.setComponent(ComponentName.createRelative(LINKEDIN_PACKAGE, LINKEDIN_FEED_PACKAGE));
+
+        try {
+            activity.startActivity(shareIntent);
+            return SUCCESS;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getLocalizedMessage();
+        }
+    }
+
+    public String shareToLinkedinDirect(String message, String imagePath, Context activity) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+        if (imagePath != null) {
+            Uri fileUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", new File(imagePath));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.setType(getMimeTypeOfFile(imagePath));
+        } else {
+            shareIntent.setType("text/plain");
+        }
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+        shareIntent.putExtra("content_url", message);
+        shareIntent.putExtra(Intent.EXTRA_TITLE, message);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        shareIntent.setPackage(LINKEDIN_PACKAGE);
+
+        shareIntent.setComponent(ComponentName.createRelative(LINKEDIN_PACKAGE, LINKEDIN_MESSAGE_PACKAGE));
+
+        try {
+            activity.startActivity(shareIntent);
+            return SUCCESS;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return e.getLocalizedMessage();
+        }
+    }
+
     private String shareTextToPackage(
             String text,
             Context context,
@@ -367,6 +450,7 @@ public class SocialShareUtil {
 
     private String shareFileAndTextToPackage(String imagePath, String message, Context activity, String packageName) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
         if (imagePath != null) {
             Uri fileUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", new File(imagePath));
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
@@ -374,14 +458,22 @@ public class SocialShareUtil {
         } else {
             shareIntent.setType("text/plain");
         }
+
         shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+        shareIntent.putExtra("content_url", message);
+        shareIntent.putExtra(Intent.EXTRA_TITLE, message);
+        shareIntent.putExtra("caption", message);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         shareIntent.setPackage(packageName);
+
         if (packageName.equals(INSTAGRAM_PACKAGE) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             shareIntent.setComponent(ComponentName.createRelative(packageName, "com.instagram.share.handleractivity.ShareHandlerActivity")); //open instagram feed
         }
+
         try {
+            copyToClipBoard(message, activity);
+
             activity.startActivity(shareIntent);
             return SUCCESS;
         } catch (Exception e) {
@@ -403,6 +495,7 @@ public class SocialShareUtil {
         appsMap.put("instagram_stories", INSTAGRAM_PACKAGE);
         appsMap.put("twitter", TWITTER_PACKAGE);
         appsMap.put("tiktok", TIKTOK_PACKAGE);
+        appsMap.put("linkedin", LINKEDIN_PACKAGE);
 
         Map<String, Boolean> apps = new HashMap<String, Boolean>();
 
@@ -413,7 +506,7 @@ public class SocialShareUtil {
         intent.setData(Uri.parse("sms:"));
         List<ResolveInfo> resolvedActivities = pm.queryIntentActivities(intent, 0);
         apps.put("message", !resolvedActivities.isEmpty());
-        String[] appNames = {"instagram", "facebook_stories", "whatsapp", "telegram", "messenger", "facebook", "facebook-lite", "messenger-lite", "instagram_stories", "twitter", "tiktok"};
+        String[] appNames = {"instagram", "facebook_stories", "whatsapp", "telegram", "messenger", "facebook", "facebook-lite", "messenger-lite", "instagram_stories", "twitter", "tiktok", "linkedin"};
 
         for (int i = 0; i < appNames.length; i++) {
             try {
