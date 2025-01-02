@@ -26,6 +26,7 @@ public class ShareUtil{
     let argBackgroundBottomColor: String  = "backgroundBottomColor";
     let argImages: String  = "images";
     let argVideoFile: String  = "videoFile";
+    let argUrl: String = "url";
 
 
     
@@ -155,6 +156,7 @@ public class ShareUtil{
             let videoFile = args[argImagePath] as? String
             let backgroundVideoUrl = URL(fileURLWithPath: videoFile!)
             let videoData = try? Data(contentsOf: backgroundVideoUrl) as NSData
+            let message = args[argMessage] as? String
 
             getLibraryPermissionIfNecessary { granted in
 
@@ -205,7 +207,9 @@ public class ShareUtil{
 
                             if UIApplication.shared.canOpenURL(url) {
 
-                                copyToClipboard(args: args, result: result)
+                                if message != nil {
+                                    UIPasteboard.general.string = message!
+                                }
 
                                 if #available(iOS 10.0, *) {
 
@@ -500,9 +504,16 @@ public class ShareUtil{
             let backgroundTopColor = args[self.argBackgroundTopColor] as? String
             let backgroundBottomColor =  args[self.argBackgroundBottomColor] as? String
             let attributionURL =  args[self.argAttributionURL] as? String
-            let message: String? = args[self.argMessage] as? String
+            let message = args[self.argMessage] as? String
             
-            guard let instagramURL = URL(string: "instagram-stories://share?source_application=\(appId!)") else {
+            if (appId == nil) {
+                result(ERROR)
+                return
+            }
+            
+            let instagramURLString = "instagram-stories://share?source_application="+appId!
+            
+            guard let instagramURL = URL(string: instagramURLString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!) else {
                 result(ERROR_APP_NOT_AVAILABLE)
                 return
             }
@@ -530,20 +541,25 @@ public class ShareUtil{
                         "com.instagram.sharedSticker.backgroundImage": backgroundImage ?? "",
                         "com.instagram.sharedSticker.backgroundTopColor": backgroundTopColor ?? "",
                         "com.instagram.sharedSticker.backgroundBottomColor": backgroundBottomColor ?? "",
-                        UIPasteboard.general.string: message ?? "",
+                        "com.instagram.sharedSticker.text": message ?? ""
                     ]
                 ]
                 let pasteboardOptions = [
                     UIPasteboard.OptionsKey.expirationDate: Date().addingTimeInterval(60 * 5)
                 ]
-                UIPasteboard.general.setItems(pasteboardItems, options: pasteboardOptions)
+                let pasteboard = UIPasteboard.general
+                pasteboard.setItems(pasteboardItems, options: pasteboardOptions)
+                
                 UIApplication.shared.open(instagramURL, options: [:])
-                result(self.SUCCESS)
+                result(SUCCESS)
+                return
             } else {
                 result(ERROR_APP_NOT_AVAILABLE)
+                return
             }
         }else{
             result(ERROR_FEATURE_NOT_AVAILABLE_FOR_THIS_VERSON)
+            return
         }
         
     }
@@ -592,15 +608,17 @@ public class ShareUtil{
     
     public func shareToLinkedinFeed(args: [String: Any?], result: @escaping FlutterResult) {
         let message = args[argMessage] as? String
+        let urlString = args[argUrl] as? String
 
-        if (message == nil) {
+        if (message == nil || urlString == nil) {
             result(ERROR)
             return
         }
 
-        let linkedinFeedUrlString = "linkedin://shareArticle?mini=true&url="+message!
+        let encodedUrl = urlString?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        let linkedinFeedUrlString = "linkedin://shareArticle?mini=true&url="+encodedUrl!
 
-        guard let linkedinFeedURL = URL(string: linkedinFeedUrlString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!) else {
+        guard let linkedinFeedURL = URL(string: linkedinFeedUrlString) else {
             result(ERROR_APP_NOT_AVAILABLE)
             return
         }
@@ -610,8 +628,10 @@ public class ShareUtil{
             return
         }
 
+        UIPasteboard.general.string = message!
+
         UIApplication.shared.open(linkedinFeedURL, options: [:])
-        result(linkedinFeedURL)
+        result(SUCCESS)
     }
 
     public func shareToLinkedinDirect(args: [String: Any?], result: @escaping FlutterResult) {

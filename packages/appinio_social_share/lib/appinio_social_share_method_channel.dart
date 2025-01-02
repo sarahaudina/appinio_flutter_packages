@@ -80,7 +80,7 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
   Future<String> shareToTwitter(String message, {String? filePath}) async {
     return ((await methodChannel.invokeMethod<String>(twitter, {
           "imagePaths": filePath == null ? [] : [filePath],
-          "message": message
+          "message": message.toMarkdown().addReadMore(SocialMediaApp.twitter),
         })) ??
         "");
   }
@@ -291,7 +291,7 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
           "videoFile": backgroundVideo,
           "backgroundTopColor": backgroundTopColor,
           "backgroundBottomColor": backgroundBottomColor,
-          "attributionURL": attributionURL,
+          "attributionURL": urls.isNotEmpty ? urls.first : null,
           "appId": appId,
           "message": urls.isNotEmpty ? urls.first : null,
         })) ??
@@ -328,8 +328,13 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
 
   @override
   Future<String> shareToLinkedinFeed(String message) async {
+    // ignore: unnecessary_string_interpolations
+    final url = '$message'.getUrls().join('\n');
+    final msg = message.toMarkdown().addReadMore(SocialMediaApp.linkedin);
+
     return ((await methodChannel.invokeMethod<String>(linkedinFeed, {
-          "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
+          "message": msg,
+          "url": url,
         })) ??
         "");
   }
@@ -358,6 +363,14 @@ class MethodChannelAppinioSocialShare extends AppinioSocialSharePlatform {
     return ((await methodChannel.invokeMethod<String>(linkedinDirect, {
           "message": message.toMarkdown().addReadMore(SocialMediaApp.linkedin),
           "imagePath": imagePath,
+        })) ??
+        "");
+  }
+
+  @override
+  Future<String> copyLinkToClipboard(String url) async {
+    return ((await methodChannel.invokeMethod<String>(copyToClipboard, {
+          "message": url.toMarkdown().getUrls().join('\n'),
         })) ??
         "");
   }

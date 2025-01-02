@@ -113,4 +113,8 @@ class IOS {
   Future<String> shareToLinkedinDirect(String message) {
     return AppinioSocialSharePlatform.instance.shareToLinkedinDirect(message);
   }
+
+  Future<String> copyLinkToClipboard(String url) {
+    return AppinioSocialSharePlatform.instance.copyLinkToClipboard(url);
+  }
 }

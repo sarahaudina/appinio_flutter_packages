@@ -134,4 +134,8 @@ class Android {
     return AppinioSocialSharePlatform.instance
         .shareToLinkedinDirectAndroid(message, imagePath);
   }
+
+  Future<String> copyLinkToClipboard(String url) {
+    return AppinioSocialSharePlatform.instance.copyLinkToClipboard(url);
+  }
 }
