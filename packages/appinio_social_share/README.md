@@ -1,4 +1,4 @@
-```appinio_social_share``` supports sharing files to social media (Facebook, Instagram, Instagram Story, Messenger, Telegram, WhatsApp, Twitter, Tiktok, SMS, System, etc.). If you want to share text, file, image, text with image or text with files then this plugin is all you need.
+```appinio_social_share_plus``` is a forked version of ```appinio_social_share```, the purpose of forking it is to add support to share to LinkedIn Feed and Chat and add a functionality to automatically parse any html message into a plain string.
 
 <br />
 
@@ -17,6 +17,8 @@
 - Twitter
 - Tiktok Status
 - Tiktok video
+- LinkedIn Feed
+- LinkedIn Chat
 - SMS
 - System ShareSheet
 - Copy to clipboard
@@ -36,7 +38,7 @@
 <img src="https://github.com/appinioGmbH/flutter_packages/blob/main/assets/social_share/ios.jpg?raw=true">
 
 
-**Simply use AppinioSocialShare class and call the method of which platform you want to share.
+**Simply use AppinioSocialSharePlus class and call the method of which platform you want to share.
 
 ## Android
 
@@ -75,13 +77,12 @@ Add these permissions and queries to your AndroidManifest.xml
     <package android:name="org.telegram.messenger" />
     <package android:name="com.whatsapp" />
     <package android:name="com.twitter.android" />
+    <package android:name="com.linkedin.android" />
   
     <provider android:authorities="com.facebook.katana.provider.PlatformProvider" /> <!-- allows app to access Facebook app features -->
     <provider android:authorities="com.facebook.orca.provider.PlatformProvider" /> <!-- allows sharing to Messenger app -->
 </queries>
 
-  <!-- Required only if your app needs to access images or photos
-       that other apps created. -->
 <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
   <!-- Required only if your app needs to access videos
@@ -104,11 +105,7 @@ Add these permissions and queries to your AndroidManifest.xml
 
 ## NOTE: 
 
-MANAGE_EXTERNAL_STORAGE requires additional permissions from google. So do not add it if you are not planning to access external storage.
-Check this for more info. https://support.google.com/googleplay/android-developer/answer/10467955?hl=en
-
-
-Create xml folder and add a provider path file to it (for example: provider_paths_app.xml) in android/app/src/main/res and 
+MANAGE_EXTERNAL_STORAGE requires additional permissions from googlCreate xml folder and add a provider path file named provider_paths.xml in android/app/src/main/res and 
 add the lines below to the created xml file
 
 ```xml
@@ -124,10 +121,14 @@ After created your own file provider and define your own path paste them into th
 
 ```xml
 
-<provider android:name="androidx.core.content.FileProvider" 
-        android:authorities="${applicationId}.provider"
-    android:exported="false" android:grantUriPermissions="true">
-    <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/[your_custom_fileProvider_file_name]" />
+<provider
+    android:name="com.appinio.socialshare.appinio_social_share.AppinioFileProvider"
+    android:authorities="${applicationId}.provider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/provider_paths"/>
 </provider>
 ```
 
@@ -193,6 +194,7 @@ Add these lines to your Info.plist file
   <string>tg</string>
   <string>whatsapp</string>
   <string>twitter</string>
+  <string>linkedin</string>
   </array>
   
   <key>NSPhotoLibraryUsageDescription</key>
@@ -444,6 +446,28 @@ class _MyAppState extends State<MyApp> {
                   }
                 },
               ),
+              ElevatedButton(
+                child: const Text("ShareToInstagramStory"),
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(type: FileType.image, allowMultiple: false);
+                  if (result != null && result.paths.isNotEmpty) {
+                    shareToInstagramStory(
+                        "yourFacebookAppId", "message", result.paths[0]!);
+                  }
+                },
+              ),
+              ElevatedButton(
+                child: const Text("ShareToFacebookStory"),
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform
+                      .pickFiles(type: FileType.image, allowMultiple: false);
+                  if (result != null && result.paths.isNotEmpty) {
+                    shareToFacebookStory(
+                        "yourFacebookAppId", result.paths[0]!);
+                  }
+                },
+              ),
             ],
           ),
         ));
@@ -452,11 +476,21 @@ class _MyAppState extends State<MyApp> {
   shareToWhatsApp(String message, String filePath) async {
     await appinioSocialShare.android.shareToSMS(message, filePath);
   }
+
+  shareToInstagramStory(String appId, String message, String filePath) async {
+    await appinioSocialShare.android.shareToInstagramStory(appId, stickerImage: filePath, message: message);
+  }
+
+  shareToFacebookStory(String appId, String filePath) async {
+    await appinioSocialShare.android.shareToInstagramStory(appId, stickerImage: filePath);
+  }
 }
 
 
 
 ```
+> [!NOTE]
+> For sharing to instagram or facebook story you need to manually pass your `facebookAppId`. You need to register your own `facebookAppId`, you can refer to this [link](https://developers.facebook.com/docs/instagram-platform/sharing-to-stories).
 
 <br />
 
@@ -480,6 +514,8 @@ class _MyAppState extends State<MyApp> {
 | copyToClipBoard      |✔️|   ✔️    | String message                                                                                                                                                                | To Copy text to clipboard.
 | shareToSystem      |✔️|   ✔️    | String title,String message, {List<String>? filePaths}                                                                                                                        | Open default System sheet, to share text and image.
 | shareImageToWhatsApp      |✔️|   ❌     | String filePaths                                                                                                                           | Share image to whatsapp
+| shareToLinkedinFeed      |✔️|   ✔️     | String message                                                                                                                           | Share text to linkedin feed, for iOS you can only share link
+| shareToLinkedinChat      |✔️|   ✔️     | String message                                                                                                                           | Share text to linkedin chat
 
 
 

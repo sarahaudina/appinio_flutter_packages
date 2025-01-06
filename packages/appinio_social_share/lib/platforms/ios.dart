@@ -1,4 +1,4 @@
-import 'package:appinio_social_share/appinio_social_share_platform_interface.dart';
+import 'package:appinio_social_share_plus/appinio_social_share_platform_interface.dart';
 
 class IOS {
   Future<String> shareToWhatsapp(String message) {

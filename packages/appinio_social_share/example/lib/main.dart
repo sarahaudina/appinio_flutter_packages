@@ -1,6 +1,6 @@
+import 'package:appinio_social_share_plus/appinio_social_share_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:appinio_social_share/appinio_social_share.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  AppinioSocialShare appinioSocialShare = AppinioSocialShare();
+  AppinioSocialSharePlus appinioSocialShare = AppinioSocialSharePlus();
 
   @override
   Widget build(BuildContext context) {
@@ -41,5 +41,15 @@ class _MyAppState extends State<MyApp> {
 
   shareToWhatsApp(String message, String filePath) async {
     await appinioSocialShare.android.shareToSMS(message, filePath);
+  }
+
+  shareToInstagramStory(String appId, String message, String filePath) async {
+    await appinioSocialShare.android
+        .shareToInstagramStory(appId, stickerImage: filePath, message: message);
+  }
+
+  shareToFacebookStory(String appId, String filePath) async {
+    await appinioSocialShare.android
+        .shareToInstagramStory(appId, stickerImage: filePath);
   }
 }

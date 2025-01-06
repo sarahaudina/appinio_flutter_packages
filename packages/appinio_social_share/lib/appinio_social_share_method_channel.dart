@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:appinio_social_share/enums/enum_social_media.dart';
-import 'package:appinio_social_share/extensions/string_extension.dart';
+import 'package:appinio_social_share_plus/enums/enum_social_media.dart';
+import 'package:appinio_social_share_plus/extensions/string_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 

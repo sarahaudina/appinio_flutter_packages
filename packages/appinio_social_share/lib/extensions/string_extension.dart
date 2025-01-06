@@ -1,4 +1,4 @@
-import 'package:appinio_social_share/enums/enum_social_media.dart';
+import 'package:appinio_social_share_plus/enums/enum_social_media.dart';
 import 'package:html2md/html2md.dart' as html2md;
 
 extension StringExtension on String {

@@ -1,3 +1,9 @@
+## [0.4.0] - 2025.01.06
+* Enhancement:
+  - Now if shared text contains a html, it will be automatically removed.
+* Features:
+  - Now you can share text to LinkedIn Feed and Chat.
+
 ## [0.3.2] - 2024.08.01
 * Many bug fixes and improvements.
 * Version upgrades for dependencies.
