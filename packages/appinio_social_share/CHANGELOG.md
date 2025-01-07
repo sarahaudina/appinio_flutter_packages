@@ -1,3 +1,7 @@
+## [0.4.1] - 2025.01.07
+* Fix:
+  - Cannot run on iOS 
+
 ## [0.4.0] - 2025.01.06
 * Enhancement:
   - Now if shared text contains a html, it will be automatically removed.

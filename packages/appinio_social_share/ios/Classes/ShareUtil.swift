@@ -511,9 +511,9 @@ public class ShareUtil{
                 return
             }
             
-            let instagramURLString = "instagram-stories://share?source_application="+appId!
+            let instagramURLString = "instagram-stories://share?source_application=\(appId!)"
             
-            guard let instagramURL = URL(string: instagramURLString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!) else {
+            guard let instagramURL = URL(string: instagramURLString) else {
                 result(ERROR_APP_NOT_AVAILABLE)
                 return
             }
