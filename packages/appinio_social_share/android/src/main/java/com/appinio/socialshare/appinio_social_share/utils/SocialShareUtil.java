@@ -334,6 +334,15 @@ public class SocialShareUtil {
         }
     }
 
+    private boolean isAppInstalled(Context context, String packageName) {
+        try {
+            context.getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
     public void shareToFacebook(List<String> filePaths, String text, Activity activity, MethodChannel.Result result) {
         FacebookSdk.fullyInitialize();
         FacebookSdk.setApplicationId(getFacebookAppId(activity));
