@@ -224,44 +224,115 @@ public class SocialShareUtil {
         }
     }
 
-    public String shareToInstagramStory(String appId, String stickerImage, String backgroundImage, String backgroundTopColor, String backgroundBottomColor, String attributionURL, String message, Context activity) {
-
+        public String shareToInstagramStory(String appId, String stickerImage, String backgroundImage,
+                                        String backgroundTopColor, String backgroundBottomColor,
+                                        String attributionURL, String message, Context activity) {
         try {
-            Intent shareIntent = new Intent(INSTAGRAM_STORY_PACKAGE);
+            // Check if Instagram is installed
+            if (!isAppInstalled(activity, "com.instagram.android")) {
+                return "Instagram app is not installed";
+            }
 
-            shareIntent.setType("image/*");
+            // Check if sticker image exists and is readable
+            if (stickerImage != null) {
+                File stickerFile = new File(stickerImage);
+                if (!stickerFile.exists() || !stickerFile.canRead()) {
+                    return "Sticker image file doesn't exist or isn't readable";
+                }
+            }
+
+            // Check if background image exists and is readable
+            if (backgroundImage != null) {
+                File backgroundFile = new File(backgroundImage);
+                if (!backgroundFile.exists() || !backgroundFile.canRead()) {
+                    return "Background image file doesn't exist or isn't readable";
+                }
+            }
+
+            Intent shareIntent = new Intent("com.instagram.share.ADD_TO_STORY");
+            shareIntent.setPackage("com.instagram.android");
+
+            // Handle background image if provided
+            if (backgroundImage != null) {
+                File file1 = new File(backgroundImage);
+                Uri backgroundImageUri = FileProvider.getUriForFile(
+                        activity,
+                        activity.getApplicationContext().getPackageName() + ".provider",
+                        file1
+                );
+
+                // Set data and type
+                shareIntent.setDataAndType(backgroundImageUri, "image/jpeg");
+                activity.grantUriPermission(
+                        "com.instagram.android",
+                        backgroundImageUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+
+                Log.d("Instagram Share", "Background image URI: " + backgroundImageUri.toString());
+            } else {
+                // If no background, still set the type
+                shareIntent.setType("image/*");
+            }
+
+            // Add flags
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+            // Handle sticker image if provided
             if (stickerImage != null) {
                 File file = new File(stickerImage);
-                Uri stickerImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file);
+                Uri stickerImageUri = FileProvider.getUriForFile(
+                        activity,
+                        activity.getApplicationContext().getPackageName() + ".provider",
+                        file
+                );
                 shareIntent.putExtra("interactive_asset_uri", stickerImageUri);
-                activity.grantUriPermission("com.instagram.android", stickerImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                activity.grantUriPermission(
+                        "com.instagram.android",
+                        stickerImageUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                );
+
+                Log.d("Instagram Share", "Sticker image URI: " + stickerImageUri.toString());
             }
 
-            if (backgroundImage != null) {
-                File file1 = new File(backgroundImage);
-                Uri backgroundImageUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", file1);
-                shareIntent.setDataAndType(backgroundImageUri, getMimeTypeOfFile(backgroundImage));
-                activity.grantUriPermission("com.instagram.android", backgroundImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-
+            // Add other extras
             shareIntent.putExtra("source_application", appId);
-            shareIntent.putExtra("content_url", attributionURL);
-            shareIntent.putExtra("top_background_color", backgroundTopColor);
-            shareIntent.putExtra("bottom_background_color", backgroundBottomColor);
 
-            copyToClipBoard(message, activity);
+            if (attributionURL != null && !attributionURL.isEmpty()) {
+                shareIntent.putExtra("content_url", attributionURL);
+            }
 
-            activity.startActivity(shareIntent);
-            return SUCCESS;
+            if (backgroundTopColor != null && !backgroundTopColor.isEmpty()) {
+                shareIntent.putExtra("top_background_color", backgroundTopColor);
+            }
+
+            if (backgroundBottomColor != null && !backgroundBottomColor.isEmpty()) {
+                shareIntent.putExtra("bottom_background_color", backgroundBottomColor);
+            }
+
+            // Copy message to clipboard if provided
+            if (message != null && !message.isEmpty()) {
+                copyToClipBoard(message, activity);
+            }
+
+            // Check if Instagram can handle this intent
+            boolean canResolve = shareIntent.resolveActivity(activity.getPackageManager()) != null;
+            Log.d("Instagram Share", "Intent can be resolved: " + canResolve);
+
+            if (canResolve) {
+                Log.d("Instagram Share", "Starting intent to share to Instagram story");
+                activity.startActivity(shareIntent);
+                return SUCCESS;
+            } else {
+                return "Instagram cannot handle this intent";
+            }
         } catch (Exception e) {
+            Log.e("Instagram Share", "Error sharing to Instagram story", e);
             return e.getLocalizedMessage();
         }
-
     }
-
 
     public void shareToFacebook(List<String> filePaths, String text, Activity activity, MethodChannel.Result result) {
         FacebookSdk.fullyInitialize();
